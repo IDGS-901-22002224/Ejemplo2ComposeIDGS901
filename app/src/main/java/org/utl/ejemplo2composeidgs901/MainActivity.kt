@@ -1,7 +1,6 @@
-package org.utl.idgs.ejemplo2composeidgs901
+package org.utl.ejemplo2composeidgs901
 
 import android.os.Bundle
-import android.widget.Button
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -26,7 +25,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import org.w3c.dom.Text
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,19 +32,20 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val navController = rememberNavController()
-            NavHost(navController = navController, startDestination = "inicio"){
-                composable ("inicio"){ PantallaInicio(navController) }
-                composable("detalle/{nombre}"){ backStackEntry ->
+            NavHost(navController = navController, startDestination = "suma") {
+                composable("inicio") { PantallaInicio(navController) }
+                composable("detalle/{nombre}") { backStackEntry ->
                     val nombre = backStackEntry.arguments?.getString("nombre") ?: "Invitado"
                     PantallaDetalle(navController, nombre)
                 }
+                composable("suma") { SumaDosNumeros(navController) }
             }
         }
     }
 }
 
 @Composable
-fun PantallaInicio(navController: NavHostController){
+fun PantallaInicio(navController: NavHostController) {
     var nombre by remember { mutableStateOf("") }
 
     Column(
@@ -55,22 +54,25 @@ fun PantallaInicio(navController: NavHostController){
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text("Pantalla de inicio")
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         TextField(
             value = nombre,
-            onValueChange = {nombre = it},
-            label = { Text("Ingrese su nombre")},
-
-            modifier = Modifier.fillMaxWidth()
+            onValueChange = { nombre = it },
+            label = { Text("Ingrese su nombre") },
+            modifier = Modifier.fillMaxWidth(0.8f)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = {
-            val nombre = nombre.ifBlank { "Oscar" }
-            navController.navigate("detalle/$nombre")
+            val nombreStr = if (nombre.isBlank()) "Invitado" else nombre
+            navController.navigate("detalle/$nombreStr")
         }) {
             Text("Ir a Detalle con nombre")
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = { navController.navigate("suma") }) {
+            Text("Ir a Suma de Números")
         }
     }
 }
@@ -83,7 +85,8 @@ fun PantallaDetalle(navController: NavHostController, nombre: String) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text("Hola, $nombre")
-        Button(onClick = {navController.navigate("inicio")}) {
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = { navController.navigate("inicio") }) {
             Text("Volver")
         }
     }
